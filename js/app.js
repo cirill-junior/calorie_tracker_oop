@@ -115,16 +115,73 @@ class Workout {
 	}
 }
 
-const tracker = new CalorieTracker();
+class App {
+	constructor() {
+		this._tracker = new CalorieTracker();
 
-const breakfast = new Meal('Breakfast', 400);
-tracker.addMeal(breakfast);
-const Lunch = new Meal('Lunch', 1800);
-tracker.addMeal(Lunch);
+		document
+			.getElementById('meal-form')
+			.addEventListener('submit', this._newMeal.bind(this));
+		document
+			.getElementById('workout-form')
+			.addEventListener('submit', this._newWorkout.bind(this));
+	}
 
-const run = new Workout('run', 300);
-tracker.addWorkout(run);
+	_newMeal(e) {
+		e.preventDefault();
 
-console.log(tracker._meals);
-console.log(tracker._workouts);
-console.log(tracker._totalCalories);
+		const name = document.getElementById('meal-name');
+		const calories = document.getElementById('meal-calories');
+
+		/* Input Validation */
+		if (name.value === '' || calories.value === '') {
+			alert('Please fill all fields');
+			return;
+		}
+
+		const meal = new Meal(
+			name.value,
+			+calories.value
+		); /* '+' is added to transform the string to number */
+
+		this._tracker.addMeal(meal);
+
+		name.value = '';
+		calories.value = '';
+
+		const collapseMeal = document.getElementById('collapse-meal');
+		const bsCollapse = new bootstrap.Collapse(collapseMeal, {
+			toggle: true,
+		});
+	}
+
+	_newWorkout(e) {
+		e.preventDefault();
+
+		const name = document.getElementById('workout-name');
+		const calories = document.getElementById('workout-calories');
+
+		/* Input Validation */
+		if (name.value === '' || calories.value === '') {
+			alert('Please fill all fields');
+			return;
+		}
+
+		const workout = new Workout(
+			name.value,
+			+calories.value
+		); /* '+' is added to transform the string to number */
+
+		this._tracker.addWorkout(workout);
+
+		name.value = '';
+		calories.value = '';
+
+		const collapseWorkout = document.getElementById('collapse-workout');
+		const bsCollapse = new bootstrap.Collapse(collapseWorkout, {
+			toggle: true,
+		});
+	}
+}
+
+const app = new App();
