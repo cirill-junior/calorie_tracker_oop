@@ -230,6 +230,22 @@ class Storage {
 	static updateTotalCalories(calories) {
 		localStorage.setItem('totalCalories', calories);
 	}
+
+	static getMeals() {
+		let meals;
+		if (localStorage.getItem('meals') === null) {
+			meals = [];
+		} else {
+			meals = JSON.parse(localStorage.getItem('meals'));
+		}
+		return meals;
+	}
+
+	static saveMeals() {
+		const meals = storage.getMeals();
+		meal.push(meal);
+		localStorage.setItem('meals', JSON.stringify(meals));
+	}
 }
 
 /* Event listeners */
