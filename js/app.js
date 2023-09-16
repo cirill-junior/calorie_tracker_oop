@@ -2,8 +2,8 @@ class CalorieTracker {
 	constructor() {
 		this._calorieLimit = Storage.getCalorieLimit();
 		this._totalCalories = Storage.getTotalCalories(0);
-		this._meals = [];
-		this._workouts = [];
+		this._meals = Storage.getMeals();
+		this._workouts = Storage.getWorkouts();
 
 		this._displayCaloriesTotal();
 		this._displayCaloriesLimit();
@@ -18,14 +18,15 @@ class CalorieTracker {
 		this._meals.push(meal);
 		this._totalCalories += meal.calories;
 		Storage.updateTotalCalories(this._totalCalories);
+		Storage.saveMeal(meal);
 		this._displayNewMeal(meal);
 		this._render();
 	}
 	addWorkout(workout) {
-		const meal = this.meal;
 		this._workouts.push(workout);
 		this._totalCalories -= workout.calories;
 		Storage.updateTotalCalories(this._totalCalories);
+		Storage.saveWorkout(workout);
 		this._displayNewWorkout(workout);
 		this._render();
 	}
@@ -65,6 +66,11 @@ class CalorieTracker {
 		Storage.setCalorieLimit(calorieLimit);
 		this._displayCaloriesLimit();
 		this._render();
+	}
+
+	loadItems() {
+		this._meals.forEach((meal) => this._displayNewMeal(meal));
+		this._workouts.forEach((workout) => this._displayNewWorkout(workout));
 	}
 
 	/*  Private Methods */
@@ -241,17 +247,37 @@ class Storage {
 		return meals;
 	}
 
-	static saveMeals() {
-		const meals = storage.getMeals();
-		meal.push(meal);
+	static saveMeal(meal) {
+		const meals = Storage.getMeals();
+		meals.push(meal);
 		localStorage.setItem('meals', JSON.stringify(meals));
+	}
+
+	static getWorkouts() {
+		let workouts;
+		if (localStorage.getItem('workouts') === null) {
+			workouts = [];
+		} else {
+			workouts = JSON.parse(localStorage.getItem('workouts'));
+		}
+		return workouts;
+	}
+
+	static saveWorkout(workout) {
+		const workouts = Storage.getWorkouts();
+		workouts.push(workout);
+		localStorage.setItem('workouts', JSON.stringify(workouts));
 	}
 }
 
-/* Event listeners */
 class App {
 	constructor() {
 		this._tracker = new CalorieTracker();
+		this._tracker.loadItems();
+		this._loadEventListeners();
+	}
+
+	_loadEventListeners() {
 		/* Add new meal and workout cards */
 		document
 			.getElementById('meal-form')
@@ -281,7 +307,7 @@ class App {
 		/* Daily limit */
 		document
 			.getElementById('limit-form')
-			.addEventListener('click', this._setLimit.bind(this));
+			.addEventListener('submit', this._setLimit.bind(this));
 	}
 
 	_newItem(type, e) {
