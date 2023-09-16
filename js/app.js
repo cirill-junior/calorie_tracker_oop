@@ -62,6 +62,7 @@ class CalorieTracker {
 		this._totalCalories = 0;
 		this._meals = [];
 		this._workouts = [];
+		Storage.clearAll();
 		this._render();
 	}
 
@@ -293,6 +294,14 @@ class Storage {
 		});
 
 		localStorage.setItem('workouts', JSON.stringify(workouts));
+	}
+
+	static clearAll() {
+		localStorage.removeItem('totalCalories');
+		localStorage.removeItem('meals');
+		localStorage.removeItem('workouts');
+
+		//localStorage.clear(); this is for removal of all, but I don't like it
 	}
 }
 
